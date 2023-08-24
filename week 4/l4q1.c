@@ -11,35 +11,19 @@ int main(int argc, char *argv[])
 
     MPI_Init(&argc, &argv);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &size);   
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    MPI_Errhandler_set(MPI_COMM_WORLD,MPI_ERRORS_RETURN);
+    MPI_Errhandler_set(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
 
-    prod = rank +1;
-    err1 = MPI_Scan(&prod, &fact,1, MPI_INT, MPI_PROD, MPI_COMM_WORLD);
+    prod = rank + 1;
+    MPI_Scan(&prod, &fact, 1, MPI_INT, MPI_PROD, MPI_COMM_WORLD);
 
-    if(err1!=MPI_SUCCESS)
-	{
-		printf("error in facorial computation.");
-		MPI_Error_string(err1,errstring,&len);
-		printf("%s",errstring);
-	}
+    MPI_Scan(&fact, &sum, 1, MPI_INT, MPI_SUM , MPI_COMM_WORLD);
 
-    err2 = MPI_Reduce(&fact, &sum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-
-    if(err2!=MPI_SUCCESS)
-	{
-		printf("error in facorial computation.");
-		MPI_Error_string(err1,errstring,&len);
-		printf("%s",errstring);
-	}
-
-
-    if(rank == 0)
+    if (rank == size -1)
     {
-        printf("totol sum is %d\n",sum);
+        printf("totol sum is %d\n", sum);
     }
-
 
     MPI_Finalize();
     return 0;
